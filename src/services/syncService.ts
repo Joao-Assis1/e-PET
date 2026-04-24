@@ -81,6 +81,7 @@ export const syncService = {
         riskScore: f.pontuacao_risco,
         riskClass: f.classificacao_risco,
         householdId: f.household_id,
+        created_at: f.created_at || new Date().toISOString(),
         bedriddenCount: f.sentinels?.bedriddenCount || 0,
         physicalDisabilityCount: f.sentinels?.physicalDisabilityCount || 0,
         mentalDisabilityCount: f.sentinels?.mentalDisabilityCount || 0,

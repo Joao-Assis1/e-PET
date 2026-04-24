@@ -19,7 +19,7 @@ const loadTerritory = async () => {
       await syncService.performInitialSync();
       const updatedFamilies = await db.families.toArray();
       console.log('Dados após sincronização:', updatedFamilies);
-      families.value = updatedFamilies;
+      families.value = [...updatedFamilies]; // Força a reatividade do Vue
     } else {
       console.log('Dados carregados do banco local:', localFamilies);
       families.value = localFamilies;
@@ -55,7 +55,7 @@ onMounted(loadTerritory);
             <v-list-item
               v-for="family in families"
               :key="family.id"
-              :title="`Família: ${family.sobrenome || 'Sem Sobrenome'}`"
+              :title="`Prontuário: ${family.familyCode || 'Sem Identificador'}`"
               :subtitle="`Cadastrada em: ${new Date(family.created_at).toLocaleDateString()}`"
             >
               <template v-slot:prepend>
