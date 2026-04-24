@@ -11,7 +11,11 @@ const loadTerritory = async () => {
   loading.value = true;
   error.value = null;
   try {
-    // Primeiro tenta ler o que já está no banco local
+    // Abre o banco explicitamente
+    if (!db.isOpen()) {
+      await db.open();
+    }
+    
     const localFamilies = await db.families.toArray();
     
     if (localFamilies.length === 0) {
@@ -66,12 +70,12 @@ onMounted(loadTerritory);
               
               <template v-slot:append>
                 <v-chip
-                  :color="family.pontuacao_risco > 5 ? 'error' : 'success'"
+                  :color="family.riskScore > 5 ? 'error' : 'success'"
                   variant="flat"
                   size="small"
                   class="font-weight-bold"
                 >
-                  Score: {{ family.pontuacao_risco || 0 }}
+                  Score: {{ family.riskScore || 0 }}
                 </v-chip>
               </template>
             </v-list-item>
