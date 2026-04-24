@@ -75,13 +75,13 @@ export const syncService = {
       });
 
       // 2. Mapear Famílias com Sentinelas Enriquecidas
-      const families: IFamily[] = rawFamilies.map((f: any) => ({
+      const families: IFamily[] = (rawFamilies || []).map((f: any) => ({
         id: f.id,
-        familyCode: f.numero_prontuario,
-        riskScore: f.pontuacao_risco,
-        riskClass: f.classificacao_risco,
-        householdId: f.household_id,
-        created_at: f.created_at || new Date().toISOString(),
+        familyCode: f.numero_prontuario || f.familyCode || 'Sem Prontuário',
+        riskScore: f.pontuacao_risco || f.riskScore || 0,
+        riskClass: f.classificacao_risco || f.riskClass || 'Sem Risco',
+        householdId: f.household_id || f.householdId,
+        created_at: f.created_at || f.createdAt || new Date().toISOString(),
         bedriddenCount: f.sentinels?.bedriddenCount || 0,
         physicalDisabilityCount: f.sentinels?.physicalDisabilityCount || 0,
         mentalDisabilityCount: f.sentinels?.mentalDisabilityCount || 0,

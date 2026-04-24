@@ -17,15 +17,13 @@ const loadTerritory = async () => {
     }
     
     const localFamilies = await db.families.toArray();
+    console.log('Famílias encontradas no IndexedDB:', localFamilies.length);
     
     if (localFamilies.length === 0) {
-      console.log('Banco local vazio, tentando sincronização inicial...');
+      console.log('Banco local vazio, disparando sincronização...');
       await syncService.performInitialSync();
-      const updatedFamilies = await db.families.toArray();
-      console.log('Dados após sincronização:', updatedFamilies);
-      families.value = [...updatedFamilies]; // Força a reatividade do Vue
+      families.value = await db.families.toArray();
     } else {
-      console.log('Dados carregados do banco local:', localFamilies);
       families.value = localFamilies;
     }
   } catch (err: any) {
