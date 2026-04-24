@@ -15,11 +15,13 @@ const loadTerritory = async () => {
     const localFamilies = await db.families.toArray();
     
     if (localFamilies.length === 0) {
-      // Se estiver vazio, tenta sincronizar do backend
       console.log('Banco local vazio, tentando sincronização inicial...');
       await syncService.performInitialSync();
-      families.value = await db.families.toArray();
+      const updatedFamilies = await db.families.toArray();
+      console.log('Dados após sincronização:', updatedFamilies);
+      families.value = updatedFamilies;
     } else {
+      console.log('Dados carregados do banco local:', localFamilies);
       families.value = localFamilies;
     }
   } catch (err: any) {
