@@ -75,14 +75,6 @@
       
       <!-- Actions Bar -->
       <div class="d-flex align-center gap-4">
-        <v-btn icon="mdi-bell-outline" variant="text" size="small" color="grey-darken-1">
-          <v-badge dot color="red" offset-x="-2" offset-y="-2">
-            <v-icon></v-icon>
-          </v-badge>
-        </v-btn>
-
-        <v-divider vertical inset class="mx-2"></v-divider>
-
         <v-menu min-width="200px" rounded="xl">
           <template v-slot:activator="{ props }">
             <v-btn
@@ -104,10 +96,7 @@
             </v-btn>
           </template>
           <v-list class="pa-2">
-            <v-list-item prepend-icon="mdi-account-outline" title="Meu Perfil" link rounded="lg"></v-list-item>
-            <v-list-item prepend-icon="mdi-cog-outline" title="Configurações" link rounded="lg"></v-list-item>
-            <v-divider class="my-2"></v-divider>
-            <v-list-item prepend-icon="mdi-logout" title="Sair" color="red" @click="handleLogout" rounded="lg"></v-list-item>
+            <v-list-item prepend-icon="mdi-logout" title="Sair do Sistema" color="red" @click="handleLogout" rounded="lg"></v-list-item>
           </v-list>
         </v-menu>
       </div>

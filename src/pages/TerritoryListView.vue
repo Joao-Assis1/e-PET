@@ -34,6 +34,16 @@ const loadTerritory = async () => {
   }
 };
 
+const getRiskColor = (risk?: string) => {
+  if (!risk) return 'grey';
+  const r = risk.toUpperCase();
+  if (r.includes('MÁXIMO') || r.includes('MAXIMO') || r.includes('R3')) return 'red-darken-4';
+  if (r.includes('MÉDIO') || r.includes('MEDIO') || r.includes('R2')) return 'deep-orange-darken-2';
+  if (r.includes('MENOR') || r.includes('R1')) return 'orange-darken-2';
+  if (r.includes('BAIXO') || r.includes('R0') || r.includes('SEM RISCO')) return 'green-darken-2';
+  return 'grey';
+};
+
 onMounted(loadTerritory);
 </script>
 
@@ -68,12 +78,12 @@ onMounted(loadTerritory);
               
               <template v-slot:append>
                 <v-chip
-                  :color="family.riskScore > 5 ? 'error' : 'success'"
+                  :color="getRiskColor(family.riskClass)"
                   variant="flat"
                   size="small"
                   class="font-weight-bold"
                 >
-                  Score: {{ family.riskScore || 0 }}
+                  {{ family.riskClass || 'Sem Risco' }}
                 </v-chip>
               </template>
             </v-list-item>

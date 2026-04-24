@@ -113,13 +113,15 @@
     </v-row>
 
     <!-- Content Area -->
-    <div v-if="hasPerformedSearch || syncStore.isSyncing">
+    <div v-if="citizens.length > 0 || syncStore.isSyncing">
       <div class="d-flex align-center mb-6">
         <h2 class="text-h5 font-weight-bold text-grey-darken-4">
           {{
             syncStore.isSyncing
               ? "Atualizando registros..."
-              : "Registros Encontrados"
+              : search
+                ? "Resultados da Busca"
+                : "Registros Recentes"
           }}
         </h2>
         <v-chip
@@ -341,7 +343,11 @@ const getEffectiveRisk = (citizen: ICitizen) => {
 
 const filteredCitizens = computed(() => {
   let result = citizens.value;
-  if (!hasPerformedSearch.value && result.length > 0) return [];
+  
+  // Se não fez busca, mostra todos os sincronizados por padrão (limitado a 50 para performance)
+  if (!search.value && !birthDateFilter.value && !motherNameFilter.value) {
+    return result.slice(0, 50);
+  }
 
   if (search.value) {
     const sNumbers = search.value.replace(/\D/g, "");
@@ -373,7 +379,7 @@ const filteredCitizens = computed(() => {
 });
 
 const performSearch = () => {
-  hasPerformedSearch.value = true;
+  // A busca agora é reativa via computed
 };
 
 const clearFilters = () => {
@@ -404,18 +410,13 @@ const calculateAge = (birthDate: string) => {
 };
 
 const getRiskColor = (risk?: string) => {
-  switch (risk) {
-    case "Risco Muito Alto":
-      return "red-darken-4";
-    case "Risco Alto":
-      return "red";
-    case "Risco Médio":
-      return "orange";
-    case "Risco Baixo":
-      return "green";
-    default:
-      return "grey";
-  }
+  if (!risk) return 'grey';
+  const r = risk.toUpperCase();
+  if (r.includes('MÁXIMO') || r.includes('MAXIMO') || r.includes('R3')) return 'red-darken-4';
+  if (r.includes('MÉDIO') || r.includes('MEDIO') || r.includes('R2')) return 'deep-orange-darken-2';
+  if (r.includes('MENOR') || r.includes('R1')) return 'orange-darken-2';
+  if (r.includes('BAIXO') || r.includes('R0') || r.includes('SEM RISCO')) return 'green-darken-2';
+  return 'grey';
 };
 </script>
 

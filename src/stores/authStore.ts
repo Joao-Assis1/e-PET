@@ -19,8 +19,8 @@ export const useAuthStore = defineStore('auth', {
 
     return {
       user,
-      token: localStorage.getItem('token'),
-      isAuthenticated: !!localStorage.getItem('token'),
+      token: null, // Token agora gerenciado via HttpOnly Cookie
+      isAuthenticated: !!user,
       loading: false,
       error: null,
     };
@@ -32,13 +32,12 @@ export const useAuthStore = defineStore('auth', {
       this.error = null;
       try {
         const response = await api.post<ILoginResponse>('/login', { cpf, senha });
-        const { access_token, user } = response.data;
+        // O token é recebido via cookie 'Set-Cookie', não mais no corpo (corpo contém apenas dados do usuário)
+        const user = response.data.user || (response.data as any);
 
-        this.token = access_token;
         this.user = user;
         this.isAuthenticated = true;
 
-        localStorage.setItem('token', access_token);
         localStorage.setItem('user', JSON.stringify(user));
 
         return true;
@@ -54,30 +53,14 @@ export const useAuthStore = defineStore('auth', {
       this.token = null;
       this.user = null;
       this.isAuthenticated = false;
-      localStorage.removeItem('token');
       localStorage.removeItem('user');
+      // Nota: Para remover o cookie HttpOnly, o backend precisaria de uma rota de /logout
     },
 
     checkAuth() {
-      const token = localStorage.getItem('token');
-      if (!token || token === 'undefined' || token === 'null') {
-        this.logout();
-        return false;
-      }
-      try {
-        const decoded: any = jwtDecode(token);
-        const currentTime = Date.now() / 1000;
-        if (decoded.exp < currentTime) {
-          this.logout();
-          return false;
-        }
-        this.isAuthenticated = true;
-        return true;
-      } catch (e) {
-        console.error('Invalid token found:', e);
-        this.logout();
-        return false;
-      }
+      // Como não podemos ler o HttpOnly Cookie via JS, confiamos na presença do usuário no state
+      // Uma verificação robusta envolveria uma chamada api.get('/auth/me')
+      return this.isAuthenticated;
     }
   }
 });
