@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const NEON_DATA_API_URL = 'https://ep-gentle-wildflower-anemu70d.apirest.c-6.us-east-1.aws.neon.tech/neondb/rest/v1';
+const NEON_DATA_API_URL = import.meta.env.VITE_NEON_DATA_API_URL || 'https://ep-gentle-wildflower-anemu70d.apirest.c-6.us-east-1.aws.neon.tech/neondb/rest/v1';
 
 export const neonService = {
   /**
