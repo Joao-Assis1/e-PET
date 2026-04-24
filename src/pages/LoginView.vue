@@ -13,7 +13,11 @@
             <div class="logo-section mb-8 text-center">
               <div class="d-flex justify-center mb-4">
                 <v-avatar color="primary" size="80" class="elevation-4">
-                  <v-icon icon="mdi-account-heart" size="48" color="white"></v-icon>
+                  <v-icon
+                    icon="mdi-account-heart"
+                    size="48"
+                    color="white"
+                  ></v-icon>
                 </v-avatar>
               </div>
               <h1 class="text-h4 font-weight-black text-primary mb-1">e-PET</h1>
@@ -40,7 +44,6 @@
               <div class="input-group mb-6">
                 <div class="d-flex justify-space-between align-center mb-1">
                   <label class="custom-label">Senha</label>
-                  <a href="#" class="text-caption text-primary font-weight-bold text-decoration-none">Esqueceu a senha?</a>
                 </div>
                 <v-text-field
                   v-model="password"
@@ -49,19 +52,13 @@
                   bg-color="white"
                   placeholder="••••••••"
                   prepend-inner-icon="mdi-lock-outline"
-                  :append-inner-icon="showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
+                  :append-inner-icon="
+                    showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'
+                  "
                   @click:append-inner="showPassword = !showPassword"
                   hide-details
                 ></v-text-field>
               </div>
-
-              <v-checkbox
-                label="Lembrar meu usuário"
-                color="primary"
-                density="compact"
-                hide-details
-                class="mb-6 custom-checkbox"
-              ></v-checkbox>
 
               <v-btn
                 type="submit"
@@ -76,8 +73,8 @@
               </v-btn>
 
               <div class="mt-8 text-center text-caption text-grey">
-                &copy; 2026 e-PET - Gestão de Saúde Pública. <br>
-                Versão 2.4.0
+                &copy; 2026 e-PET - Gestão de Saúde Pública. <br />
+                Versão 1.0.0
               </div>
             </v-form>
           </v-card>
@@ -88,24 +85,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/authStore';
-import { storeToRefs } from 'pinia';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
+import { storeToRefs } from "pinia";
 
 const router = useRouter();
 const authStore = useAuthStore();
 const { loading, error } = storeToRefs(authStore);
 
-const cpf = ref('');
-const password = ref('');
+const cpf = ref("");
+const password = ref("");
 const showPassword = ref(false);
 
 const handleLogin = async () => {
-  const cleanCpf = cpf.value.replace(/\D/g, '');
+  const cleanCpf = cpf.value.replace(/\D/g, "");
   const success = await authStore.login(cleanCpf, password.value);
   if (success) {
-    router.push('/');
+    router.push("/");
   }
 };
 </script>
