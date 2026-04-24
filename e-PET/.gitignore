@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.env*
+.vscode/
+.DS_Store
+.ruler
+AGENTS.md
+.agent/
+.agents/   
+.specs/
+tlc-spec-driven/
+.agents
+Referencias_Telas
+captura_telas

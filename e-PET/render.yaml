@@ -1,0 +1,15 @@
+services:
+  # --- Frontend: e-PET (Vue 3 + Vuetify) ---
+  - type: web
+    name: e-pet
+    runtime: static
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://e-tet-api.onrender.com # Altere para a URL real da sua API
+    routes:
+      - source: /*
+        destination: /index.html
+        type: rewrite
