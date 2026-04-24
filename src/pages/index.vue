@@ -240,7 +240,7 @@ import { useSyncStore } from '@/stores/syncStore';
 import { db } from '@/services/localDb';
 import { useObservable } from '@vueuse/rxjs';
 import { liveQuery } from 'dexie';
-import type { ICitizen } from '@/types/citizen';
+import type { ICitizen, IFamily } from '@/types/citizen';
 
 const router = useRouter();
 const syncStore = useSyncStore();
