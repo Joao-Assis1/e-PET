@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { neonService } from '@/services/neonService';
+import { db } from '@/services/localDb';
+import { syncService } from '@/services/syncService';
 
 const families = ref<any[]>([]);
 const loading = ref(true);
@@ -10,10 +11,20 @@ const loadTerritory = async () => {
   loading.value = true;
   error.value = null;
   try {
-    families.value = await neonService.getFamilies();
-  } catch (err) {
-    error.value = 'Falha ao carregar dados diretamente do Neon.';
-    console.error(err);
+    // Primeiro tenta ler o que já está no banco local
+    const localFamilies = await db.families.toArray();
+    
+    if (localFamilies.length === 0) {
+      // Se estiver vazio, tenta sincronizar do backend
+      console.log('Banco local vazio, tentando sincronização inicial...');
+      await syncService.performInitialSync();
+      families.value = await db.families.toArray();
+    } else {
+      families.value = localFamilies;
+    }
+  } catch (err: any) {
+    error.value = 'Falha ao sincronizar dados. Verifique sua conexão e se está logado.';
+    console.error('Erro no território:', err);
   } finally {
     loading.value = false;
   }
