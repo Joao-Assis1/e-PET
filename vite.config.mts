@@ -29,7 +29,7 @@ export default defineConfig({
       },
     }),
   ],
-  define: { "process.env": {} },
+  // define: { "process.env": {} }, // Removido para evitar conflitos com import.meta.env na Vercel
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("src", import.meta.url)),
