@@ -3,56 +3,57 @@
     <!-- Modern HIS Sidebar -->
     <v-navigation-drawer
       v-model="drawer"
-      :rail="rail"
-      permanent
-      elevation="0"
-      width="280"
-      color="primary"
       class="his-sidebar"
+      color="primary"
+      elevation="0"
+      permanent
+      :rail="rail"
+      width="280"
     >
       <div class="sidebar-header d-flex align-center pa-4" :class="{ 'justify-center': rail }">
-        <v-icon icon="mdi-account-heart" color="white" :size="rail ? 32 : 40" class="mr-2"></v-icon>
+        <v-icon class="mr-2" color="white" icon="mdi-account-heart" :size="rail ? 32 : 40" />
         <span v-if="!rail" class="text-h5 font-weight-black text-white">e-PET</span>
       </div>
 
-      <v-divider class="opacity-20 mx-4"></v-divider>
+      <v-divider class="opacity-20 mx-4" />
 
-      <v-list density="comfortable" nav class="mt-4 px-2">
+      <v-list class="mt-4 px-2" density="comfortable" nav>
         <v-list-item
           v-for="(item, i) in menuItems"
           :key="i"
-          :to="item.to"
-          :value="item.value"
           active-class="active-menu-item"
           class="menu-item mb-2"
+          exact
           rounded="lg"
+          :to="item.to"
+          :value="item.value"
         >
-          <template v-slot:prepend>
-            <v-icon :icon="item.icon" size="22" class="mr-2"></v-icon>
+          <template #prepend>
+            <v-icon class="mr-2" :icon="item.icon" size="22" />
           </template>
-          <v-list-item-title class="font-weight-bold text-uppercase letter-spacing-1" v-if="!rail">
+          <v-list-item-title v-if="!rail" class="font-weight-bold text-uppercase letter-spacing-1">
             {{ item.title }}
           </v-list-item-title>
         </v-list-item>
       </v-list>
 
-      <template v-slot:append>
+      <template #append>
         <div class="pa-4">
           <v-btn
-            variant="text"
             block
             class="justify-start text-white opacity-70 hover-opacity-100"
+            variant="text"
             @click="rail = !rail"
           >
-            <v-icon :icon="rail ? 'mdi-chevron-right' : 'mdi-chevron-left'" size="24"></v-icon>
+            <v-icon :icon="rail ? 'mdi-chevron-right' : 'mdi-chevron-left'" size="24" />
             <span v-if="!rail" class="ml-4 font-weight-bold">Recolher</span>
           </v-btn>
           <v-btn
-            variant="text"
             block
-            color="red-lighten-3"
             class="justify-start mt-2"
+            color="red-lighten-3"
             prepend-icon="mdi-logout-variant"
+            variant="text"
             @click="handleLogout"
           >
             <span v-if="!rail" class="ml-2 font-weight-bold">Sair do Portal</span>
@@ -62,25 +63,25 @@
     </v-navigation-drawer>
 
     <!-- Professional Top Bar -->
-    <v-app-bar elevation="0" color="white" border="bottom" class="his-topbar px-4">
+    <v-app-bar border="bottom" class="his-topbar px-4" color="white" elevation="0">
       <div class="d-flex align-center">
-        <v-breadcrumbs :items="breadcrumbs" class="pa-0 breadcrumbs-custom">
-          <template v-slot:divider>
-            <v-icon icon="mdi-chevron-right" size="14" color="grey"></v-icon>
+        <v-breadcrumbs class="pa-0 breadcrumbs-custom" :items="breadcrumbs">
+          <template #divider>
+            <v-icon color="grey" icon="mdi-chevron-right" size="14" />
           </template>
         </v-breadcrumbs>
       </div>
-      
-      <v-spacer></v-spacer>
-      
+
+      <v-spacer />
+
       <!-- Actions Bar -->
       <div class="d-flex align-center gap-4">
         <v-menu min-width="200px" rounded="xl">
-          <template v-slot:activator="{ props }">
+          <template #activator="{ props }">
             <v-btn
               v-bind="props"
-              variant="text"
               class="user-profile-btn rounded-xl px-2"
+              variant="text"
             >
               <div class="text-right mr-3 d-none d-sm-block">
                 <div class="text-caption font-weight-black text-grey-darken-3 line-height-1">
@@ -90,59 +91,67 @@
                   Enfermeiro(a) • Equipe 04
                 </div>
               </div>
-              <v-avatar color="primary" size="32" class="elevation-2">
-                <v-icon icon="mdi-account-circle" color="white"></v-icon>
+              <v-avatar class="elevation-2" color="primary" size="32">
+                <v-icon color="white" icon="mdi-account-circle" />
               </v-avatar>
             </v-btn>
           </template>
           <v-list class="pa-2">
-            <v-list-item prepend-icon="mdi-logout" title="Sair do Sistema" color="red" @click="handleLogout" rounded="lg"></v-list-item>
+            <v-list-item
+              color="red"
+              prepend-icon="mdi-logout"
+              rounded="lg"
+              title="Sair do Sistema"
+              @click="handleLogout"
+            />
           </v-list>
         </v-menu>
       </div>
     </v-app-bar>
 
     <v-main class="bg-background content-area">
-      <router-view></router-view>
+      <router-view />
     </v-main>
   </v-app>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useAuthStore } from '@/stores/authStore';
-import { useRouter, useRoute } from 'vue-router';
+  import { computed, ref } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+  import { useAuthStore } from '@/stores/authStore'
 
-const authStore = useAuthStore();
-const router = useRouter();
-const route = useRoute();
+  const authStore = useAuthStore()
+  const router = useRouter()
+  const route = useRoute()
 
-const drawer = ref(true);
-const rail = ref(false);
+  const drawer = ref(true)
+  const rail = ref(false)
 
-const userName = computed(() => authStore.user?.name || 'Profissional');
+  const userName = computed(() => authStore.user?.name || 'Profissional')
 
-const menuItems = [
-  { title: 'Cidadãos', icon: 'mdi-account-group', value: 'citizens', to: '/' },
-];
+  const menuItems = [
+    { title: 'Dashboard', icon: 'mdi-view-dashboard', value: 'dashboard', to: '/dashboard' },
+    { title: 'Cidadãos', icon: 'mdi-account-group', value: 'citizens', to: '/' },
+  ]
 
-const breadcrumbs = computed(() => {
-  const items = [{ title: 'Home', disabled: false, href: '/' }];
-  
-  if (route.name === 'Home' || route.path === '/') {
-    items.push({ title: 'Gestão de Cidadãos', disabled: true, href: '#' });
-  } else if (route.name === 'citizen-summary') {
-    items.push({ title: 'Cidadãos', disabled: false, href: '/' });
-    items.push({ title: 'Prontuário Individual', disabled: true, href: '#' });
+  const breadcrumbs = computed(() => {
+    const items = [{ title: 'Home', disabled: false, href: '/' }]
+
+    if (route.name === 'Home' || route.path === '/') {
+      items.push({ title: 'Gestão de Cidadãos', disabled: true, href: '#' })
+    } else if (route.name === 'Dashboard') {
+      items.push({ title: 'Dashboard Territorial', disabled: true, href: '#' })
+    } else if (route.name === 'citizen-summary') {
+      items.push({ title: 'Cidadãos', disabled: false, href: '/' }, { title: 'Prontuário Individual', disabled: true, href: '#' })
+    }
+
+    return items
+  })
+
+  function handleLogout () {
+    authStore.logout()
+    router.push('/login')
   }
-  
-  return items;
-});
-
-const handleLogout = () => {
-  authStore.logout();
-  router.push('/login');
-};
 </script>
 
 <style scoped>

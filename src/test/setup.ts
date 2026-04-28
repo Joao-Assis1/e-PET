@@ -1,6 +1,6 @@
+import { createPinia, setActivePinia } from 'pinia'
 import { vi } from 'vitest'
 import 'fake-indexeddb/auto'
-import { createPinia, setActivePinia } from 'pinia'
 
 // Initialize Pinia for every test
 setActivePinia(createPinia())
@@ -22,7 +22,7 @@ Object.defineProperty(window, 'matchMedia', {
 
 // Mock ResizeObserver for Vuetify/Browser compatibility
 window.ResizeObserver = vi.fn().mockImplementation(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn(),
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
 }))

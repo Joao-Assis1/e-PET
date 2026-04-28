@@ -1,22 +1,22 @@
-import api from './api';
-import { db } from './localDb';
-import type { ICitizen, IFamily, IHealthCondition } from '@/types/citizen';
+import type { ICitizen, IFamily, IHealthCondition } from '@/types/citizen'
+import api from './api'
+import { db } from './localDb'
 
 export const syncService = {
-  async performInitialSync() {
+  async performInitialSync () {
     try {
-      console.log('Iniciando sincronização via Backend NestJS (Cookies HttpOnly)...');
+      console.log('Iniciando sincronização via Backend NestJS (Cookies HttpOnly)...')
 
       // 1. Chamar o endpoint especializado de sincronização inicial
-      const response = await api.get('/sync/initial');
-      
+      const response = await api.get('/sync/initial')
+
       if (!response.data || !response.data.data) {
-        throw new Error('Resposta do servidor malformada: campo "data" não encontrado.');
+        throw new Error('Resposta do servidor malformada: campo "data" não encontrado.')
       }
 
-      const { individuals, families: rawFamilies } = response.data.data;
+      const { individuals, families: rawFamilies } = response.data.data
 
-      const citizens: ICitizen[] = [];
+      const citizens: ICitizen[] = []
       const conditions: IHealthCondition[] = [];
 
       (individuals || []).forEach((i: any) => {
@@ -35,13 +35,13 @@ export const syncService = {
           isResponsible: i.is_responsavel || false,
           familyId: i.family_id || i.family?.id,
           riskClass: i.classificacao_risco || 'Sem Risco',
-          lastUpdate: i.updated_at
-        };
-        citizens.push(mappedCitizen);
+          lastUpdate: i.updated_at,
+        }
+        citizens.push(mappedCitizen)
 
         // Extrair condições de saúde embutidas
         if (i.healthConditions) {
-          const hc = i.healthConditions;
+          const hc = i.healthConditions
           const mapping = [
             { key: 'diabetes', label: 'Diabetes' },
             { key: 'hipertensao_arterial', label: 'Hipertensão Arterial' },
@@ -49,10 +49,10 @@ export const syncService = {
             { key: 'doenca_respiratoria', label: 'Doença Respiratória' },
             { key: 'hanseniase', label: 'Hanseníase' },
             { key: 'tuberculose', label: 'Tuberculose' },
-            { key: 'teve_cancer', label: 'Câncer' }
-          ];
+            { key: 'teve_cancer', label: 'Câncer' },
+          ]
 
-          mapping.forEach(m => {
+          for (const m of mapping) {
             if (hc[m.key]) {
               conditions.push({
                 id: `${i.id}-${m.key}`,
@@ -60,14 +60,14 @@ export const syncService = {
                 label: m.label,
                 type: 'Condição Crônica',
                 value: 'Identificado no prontuário.',
-                updatedAt: i.updated_at
-              });
+                updatedAt: i.updated_at,
+              })
             }
-          });
+          }
         }
-      });
+      })
 
-      console.log(`[Sync] Cidadãos mapeados: ${citizens.length}. Condições: ${conditions.length}.`);
+      console.log(`[Sync] Cidadãos mapeados: ${citizens.length}. Condições: ${conditions.length}.`)
 
       // 2. Mapear Famílias com Sentinelas Enriquecidas
       const families: IFamily[] = (rawFamilies || []).map((f: any) => ({
@@ -88,26 +88,32 @@ export const syncService = {
         over70YearsCount: f.sentinels?.over70YearsCount || 0,
         hypertensionCount: f.sentinels?.hypertensionCount || 0,
         diabetesCount: f.sentinels?.diabetesCount || 0,
-        basicSanitation: f.sentinels ? f.sentinels.basicSanitation : !f.saneamento_inadequado
-      }));
+        basicSanitation: f.sentinels ? f.sentinels.basicSanitation : !f.saneamento_inadequado,
+      }))
 
       // Transação Atômica no IndexedDB
-      console.log('[Sync] Iniciando gravação no IndexedDB...');
+      console.log('[Sync] Iniciando gravação no IndexedDB...')
       await db.transaction('rw', [db.families, db.citizens, db.health_conditions], async () => {
-        await db.families.clear();
-        await db.citizens.clear();
-        await db.health_conditions.clear();
+        await db.families.clear()
+        await db.citizens.clear()
+        await db.health_conditions.clear()
 
-        if (families.length > 0) await db.families.bulkAdd(families);
-        if (citizens.length > 0) await db.citizens.bulkAdd(citizens);
-        if (conditions.length > 0) await db.health_conditions.bulkAdd(conditions);
-      });
+        if (families.length > 0) {
+          await db.families.bulkAdd(families)
+        }
+        if (citizens.length > 0) {
+          await db.citizens.bulkAdd(citizens)
+        }
+        if (conditions.length > 0) {
+          await db.health_conditions.bulkAdd(conditions)
+        }
+      })
 
-      console.log('[Sync] Sincronização concluída com sucesso!');
-      return true;
+      console.log('[Sync] Sincronização concluída com sucesso!')
+      return true
     } catch (error: any) {
-      console.error('Erro na sincronização:', error.response?.data || error.message);
-      throw error;
+      console.error('Erro na sincronização:', error.response?.data || error.message)
+      throw error
     }
-  }
-};
+  },
+}
