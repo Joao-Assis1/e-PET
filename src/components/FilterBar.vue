@@ -88,17 +88,23 @@
 
   const dateRangeText = computed(() => {
     if (selectedDates.value.length === 0) return ''
-    if (selectedDates.value.length === 1) return selectedDates.value[0].toLocaleDateString()
-
     const start = selectedDates.value[0]
+    if (selectedDates.value.length === 1) return start.toLocaleDateString()
+
     const end = selectedDates.value.at(-1)
-    return `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`
+    return end
+      ? `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`
+      : start.toLocaleDateString()
   })
 
   function handleDateChange (dates: Date[]) {
-    if (dates.length >= 2) {
-      filters.startDate = dates[0].toISOString()
-      filters.endDate = dates.at(-1).toISOString()
+    if (dates && dates.length >= 2) {
+      const start = dates[0]
+      const end = dates.at(-1)
+
+      if (start) filters.startDate = start.toISOString()
+      if (end) filters.endDate = end.toISOString()
+
       emitFilters()
     }
   }
