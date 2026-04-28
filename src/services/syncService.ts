@@ -3,6 +3,16 @@ import api from './api'
 import { db } from './localDb'
 
 export const syncService = {
+  normalizeRisk (risk: string | null | undefined): string {
+    if (!risk) return 'Sem Risco'
+    const r = risk.toString().toLowerCase()
+    if (r.includes('máximo') || r === 'r3') return 'R3'
+    if (r.includes('médio') || r === 'r2') return 'R2'
+    if (r.includes('menor') || r === 'r1') return 'R1'
+    if (r.includes('baixo') || r === 'r0') return 'R0'
+    return risk
+  },
+
   async performInitialSync () {
     try {
       console.log('Iniciando sincronização via Backend NestJS (Cookies HttpOnly)...')
@@ -16,10 +26,35 @@ export const syncService = {
 
       const { individuals, families: rawFamilies } = response.data.data
 
+      // Mapear famílias com normalização de risco
+      const families: IFamily[] = (rawFamilies || []).map((f: any) => ({
+        id: f.id,
+        familyCode: f.numero_prontuario || 'Sem Prontuário',
+        riskScore: f.pontuacao_risco || 0,
+        riskClass: this.normalizeRisk(f.classificacao_risco),
+        householdId: f.household_id || f.household?.id,
+        created_at: f.created_at || new Date().toISOString(),
+        bedriddenCount: f.sentinels?.bedriddenCount || 0,
+        physicalDisabilityCount: f.sentinels?.physicalDisabilityCount || 0,
+        mentalDisabilityCount: f.sentinels?.mentalDisabilityCount || 0,
+        severeMalnutritionCount: f.sentinels?.severeMalnutritionCount || 0,
+        drugAddictionCount: f.sentinels?.drugAddictionCount || 0,
+        unemployedCount: f.sentinels?.unemployedCount || 0,
+        illiterateCount: f.sentinels?.illiterateCount || 0,
+        under6MonthsCount: f.sentinels?.under6MonthsCount || 0,
+        over70YearsCount: f.sentinels?.over70YearsCount || 0,
+        hypertensionCount: f.sentinels?.hypertensionCount || 0,
+        diabetesCount: f.sentinels?.diabetesCount || 0,
+        basicSanitation: f.sentinels ? f.sentinels.basicSanitation : !f.saneamento_inadequado,
+      }))
+
+      const familyRiskMap = new Map(families.map(f => [f.id, f.riskClass]))
+
       const citizens: ICitizen[] = []
       const conditions: IHealthCondition[] = [];
 
       (individuals || []).forEach((i: any) => {
+        const fId = i.family_id || i.family?.id
         const mappedCitizen: ICitizen = {
           id: i.id,
           name: i.nome_completo || 'Sem Nome',
@@ -33,8 +68,9 @@ export const syncService = {
           neighborhood: i.household?.bairro || i.family?.household?.bairro || '',
           zipCode: i.household?.cep || i.family?.household?.cep || '',
           isResponsible: i.is_responsavel || false,
-          familyId: i.family_id || i.family?.id,
-          riskClass: i.classificacao_risco || 'Sem Risco',
+          familyId: fId,
+          // Se o indivíduo não tem risco próprio, herda da família
+          riskClass: this.normalizeRisk(i.classificacao_risco || familyRiskMap.get(fId)),
           lastUpdate: i.updated_at,
         }
         citizens.push(mappedCitizen)
@@ -68,28 +104,6 @@ export const syncService = {
       })
 
       console.log(`[Sync] Cidadãos mapeados: ${citizens.length}. Condições: ${conditions.length}.`)
-
-      // 2. Mapear Famílias com Sentinelas Enriquecidas
-      const families: IFamily[] = (rawFamilies || []).map((f: any) => ({
-        id: f.id,
-        familyCode: f.numero_prontuario || 'Sem Prontuário',
-        riskScore: f.pontuacao_risco || 0,
-        riskClass: f.classificacao_risco || 'Sem Risco',
-        householdId: f.household_id || f.household?.id,
-        created_at: f.created_at || new Date().toISOString(),
-        bedriddenCount: f.sentinels?.bedriddenCount || 0,
-        physicalDisabilityCount: f.sentinels?.physicalDisabilityCount || 0,
-        mentalDisabilityCount: f.sentinels?.mentalDisabilityCount || 0,
-        severeMalnutritionCount: f.sentinels?.severeMalnutritionCount || 0,
-        drugAddictionCount: f.sentinels?.drugAddictionCount || 0,
-        unemployedCount: f.sentinels?.unemployedCount || 0,
-        illiterateCount: f.sentinels?.illiterateCount || 0,
-        under6MonthsCount: f.sentinels?.under6MonthsCount || 0,
-        over70YearsCount: f.sentinels?.over70YearsCount || 0,
-        hypertensionCount: f.sentinels?.hypertensionCount || 0,
-        diabetesCount: f.sentinels?.diabetesCount || 0,
-        basicSanitation: f.sentinels ? f.sentinels.basicSanitation : !f.saneamento_inadequado,
-      }))
 
       // Transação Atômica no IndexedDB
       console.log('[Sync] Iniciando gravação no IndexedDB...')

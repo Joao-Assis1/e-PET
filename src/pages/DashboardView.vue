@@ -1,12 +1,13 @@
 <template>
   <v-container class="pa-6 bg-grey-lighten-4 min-vh-100" fluid>
     <!-- Header -->
-    <div class="d-flex align-center justify-space-between mb-6">
+    <div class="d-flex flex-column flex-sm-row align-sm-center justify-space-between mb-6 ga-4">
       <div>
         <h1 class="text-h4 font-weight-bold text-primary mb-1">Dashboard Territorial</h1>
         <p class="text-subtitle-1 text-grey-darken-1">Visão analítica da saúde do território</p>
       </div>
       <v-btn
+        class="align-self-start align-self-sm-center"
         color="primary"
         elevation="1"
         :loading="store.loading"
@@ -62,7 +63,7 @@
     <!-- Charts -->
     <v-row v-if="store.stats" class="mt-4">
       <v-col cols="12" lg="4">
-        <RiskDonutChart :data="store.stats.riskDistribution" />
+        <RiskDonutChart v-if="Object.keys(store.stats.riskDistribution).length > 0" :data="store.stats.riskDistribution" />
       </v-col>
       <v-col cols="12" lg="8">
         <VulnerabilityBarChart :data="store.stats.vulnerabilityFactors" />

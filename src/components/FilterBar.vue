@@ -52,8 +52,9 @@
         />
       </v-col>
 
-      <v-col class="text-right" cols="12" md="2">
+      <v-col class="text-left text-md-right" cols="12" md="2">
         <v-btn
+          class="px-0 px-md-4"
           color="secondary"
           prepend-icon="mdi-filter-off"
           variant="text"

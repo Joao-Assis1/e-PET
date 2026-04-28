@@ -6,13 +6,13 @@
       class="his-sidebar"
       color="primary"
       elevation="0"
-      permanent
-      :rail="rail"
+      :permanent="$vuetify.display.mdAndUp"
+      :rail="rail && $vuetify.display.mdAndUp"
       width="280"
     >
-      <div class="sidebar-header d-flex align-center pa-4" :class="{ 'justify-center': rail }">
-        <v-icon class="mr-2" color="white" icon="mdi-account-heart" :size="rail ? 32 : 40" />
-        <span v-if="!rail" class="text-h5 font-weight-black text-white">e-PET</span>
+      <div class="sidebar-header d-flex align-center pa-4" :class="{ 'justify-center': rail && $vuetify.display.mdAndUp }">
+        <v-icon class="mr-2" color="white" icon="mdi-account-heart" :size="rail && $vuetify.display.mdAndUp ? 32 : 40" />
+        <span v-if="!rail || !$vuetify.display.mdAndUp" class="text-h5 font-weight-black text-white">e-PET</span>
       </div>
 
       <v-divider class="opacity-20 mx-4" />
@@ -31,7 +31,7 @@
           <template #prepend>
             <v-icon class="mr-2" :icon="item.icon" size="22" />
           </template>
-          <v-list-item-title v-if="!rail" class="font-weight-bold text-uppercase letter-spacing-1">
+          <v-list-item-title v-if="!rail || !$vuetify.display.mdAndUp" class="font-weight-bold text-uppercase letter-spacing-1">
             {{ item.title }}
           </v-list-item-title>
         </v-list-item>
@@ -40,6 +40,7 @@
       <template #append>
         <div class="pa-4">
           <v-btn
+            v-if="$vuetify.display.mdAndUp"
             block
             class="justify-start text-white opacity-70 hover-opacity-100"
             variant="text"
@@ -56,7 +57,7 @@
             variant="text"
             @click="handleLogout"
           >
-            <span v-if="!rail" class="ml-2 font-weight-bold">Sair do Portal</span>
+            <span v-if="!rail || !$vuetify.display.mdAndUp" class="ml-2 font-weight-bold">Sair do Portal</span>
           </v-btn>
         </div>
       </template>
@@ -64,6 +65,11 @@
 
     <!-- Professional Top Bar -->
     <v-app-bar border="bottom" class="his-topbar px-4" color="white" elevation="0">
+      <v-app-bar-nav-icon
+        class="d-md-none mr-2"
+        @click="drawer = !drawer"
+      />
+
       <div class="d-flex align-center">
         <v-breadcrumbs class="pa-0 breadcrumbs-custom" :items="breadcrumbs">
           <template #divider>

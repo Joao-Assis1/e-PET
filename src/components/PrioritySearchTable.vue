@@ -1,10 +1,10 @@
 <template>
   <v-card class="pa-4" elevation="1">
-    <div class="d-flex align-center justify-space-between mb-4">
+    <div class="d-flex flex-column flex-sm-row align-sm-center justify-space-between mb-4 ga-2">
       <h3 class="text-h6">Busca Ativa - Cidadãos Prioritários</h3>
       <v-text-field
         v-model="search"
-        class="max-width-300"
+        class="search-field"
         density="compact"
         hide-details
         label="Pesquisar por nome ou CNS"
@@ -95,8 +95,13 @@
 </script>
 
 <style scoped>
-.max-width-300 {
-  max-width: 300px;
+.search-field {
+  width: 100%;
+}
+@media (min-width: 600px) {
+  .search-field {
+    max-width: 300px;
+  }
 }
 .gap-1 {
   gap: 4px;
