@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import axios from 'axios'
-import { syncService } from '../syncService'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { db } from '../localDb'
+import { syncService } from '../syncService'
 
 vi.mock('axios')
 const mockedAxios = axios as vi.Mocked<typeof axios>
@@ -12,43 +12,49 @@ describe('syncService', () => {
     await db.citizens.clear()
     await db.families.clear()
     await db.health_conditions.clear()
-    
+
     // Setup token
     localStorage.setItem('token', 'fake-token')
-    
+
     vi.clearAllMocks()
   })
 
   it('should fetch data from Neon and sync to local database', async () => {
     // Mock Neon API Responses
     const mockFamilies = [{ id: 'fam-1', numero_prontuario: 'PRONT-01', pontuacao_risco: 5, domicilio_id: 'dom-1' }]
-    const mockIndividuals = [{ 
-      id: 'ind-1', 
-      nome_completo: 'João Silva', 
-      cpf: '12345678900', 
-      cartao_sus: '12345', 
-      data_nascimento: '1990-01-01', 
+    const mockIndividuals = [{
+      id: 'ind-1',
+      nome_completo: 'João Silva',
+      cpf: '12345678900',
+      cartao_sus: '12345',
+      data_nascimento: '1990-01-01',
       is_responsavel: true,
-      familia_id: 'fam-1'
+      familia_id: 'fam-1',
     }]
-    const mockConditions = [{ 
-      id: 'cond-1', 
-      individual_id: 'ind-1', 
-      label: 'Hipertensão', 
-      value: true 
+    const mockConditions = [{
+      id: 'cond-1',
+      individual_id: 'ind-1',
+      label: 'Hipertensão',
+      value: true,
     }]
 
-    mockedAxios.get.mockImplementation((url) => {
-      if (url.includes('/families')) return Promise.resolve({ data: mockFamilies })
-      if (url.includes('/individuals')) return Promise.resolve({ data: mockIndividuals })
-      if (url.includes('/individual_health_conditions')) return Promise.resolve({ data: mockConditions })
+    mockedAxios.get.mockImplementation(url => {
+      if (url.includes('/families')) {
+        return Promise.resolve({ data: mockFamilies })
+      }
+      if (url.includes('/individuals')) {
+        return Promise.resolve({ data: mockIndividuals })
+      }
+      if (url.includes('/individual_health_conditions')) {
+        return Promise.resolve({ data: mockConditions })
+      }
       return Promise.reject(new Error('Unknown URL'))
     })
 
     const result = await syncService.performInitialSync()
 
     expect(result).toBe(true)
-    
+
     // Verify Dexie storage
     const citizens = await db.citizens.toArray()
     expect(citizens).toHaveLength(1)

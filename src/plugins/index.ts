@@ -1,23 +1,21 @@
-import router from '../router';
-import i18n from './i18n';
-import {createPinia} from 'pinia';
-import { vMaska } from "maska/vue"
+// Types
+import type { App } from 'vue'
+import { vMaska } from 'maska/vue'
+import { createPinia } from 'pinia'
+import router from '../router'
 /**
  * plugins/index.ts
  *
  * Automatically included in `./src/main.ts`
  */
-
-// Types
-import type { App } from 'vue'
-
+import i18n from './i18n'
 // Plugins
 import vuetify from './vuetify'
 
 export function registerPlugins (app: App) {
- app.use(vuetify)
- app.use(createPinia());
- app.use(i18n);
- app.use(router);
- app.directive("maska", vMaska);
+  app.use(vuetify)
+  app.use(createPinia())
+  app.use(i18n)
+  app.use(router)
+  app.directive('maska', vMaska)
 }

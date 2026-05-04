@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url'
-import { defineConfig, configDefaults } from 'vitest/config'
+import { configDefaults, defineConfig } from 'vitest/config'
 
 export default defineConfig({
   test: {
@@ -9,7 +9,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
-  }
+      '@': fileURLToPath(new URL('src', import.meta.url)),
+    },
+  },
 })

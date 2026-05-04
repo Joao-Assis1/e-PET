@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { setActivePinia, createPinia } from 'pinia'
-import { useSyncStore } from '../syncStore'
+import { createPinia, setActivePinia } from 'pinia'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { syncService } from '@/services/syncService'
+import { useSyncStore } from '../syncStore'
 
 vi.mock('@/services/syncService', () => ({
   syncService: {
-    performInitialSync: vi.fn()
-  }
+    performInitialSync: vi.fn(),
+  },
 }))
 
 describe('syncStore', () => {
@@ -21,11 +21,11 @@ describe('syncStore', () => {
     vi.mocked(syncService.performInitialSync).mockResolvedValueOnce(true)
 
     const syncPromise = syncStore.startSync()
-    
+
     expect(syncStore.isSyncing).toBe(true)
-    
+
     await syncPromise
-    
+
     expect(syncStore.isSyncing).toBe(false)
     expect(syncStore.lastSync).not.toBe(null)
     expect(syncStore.error).toBe(null)
@@ -36,7 +36,7 @@ describe('syncStore', () => {
     vi.mocked(syncService.performInitialSync).mockRejectedValueOnce(new Error('API Down'))
 
     await syncStore.startSync()
-    
+
     expect(syncStore.isSyncing).toBe(false)
     expect(syncStore.error).toBe('API Down')
   })

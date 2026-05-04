@@ -2,22 +2,28 @@
   <div class="login-wrapper">
     <!-- Background Elements -->
     <div class="bg-decoration">
-      <div class="circle circle-1"></div>
-      <div class="circle circle-2"></div>
+      <div class="circle circle-1" />
+      <div class="circle circle-2" />
     </div>
 
     <v-container class="fill-height justify-center relative-container" fluid>
       <v-row class="justify-center align-center w-100 ma-0">
-        <v-col cols="12" sm="8" md="5" lg="4" xl="3">
-          <v-card class="login-card pa-8 pa-md-10" border>
+        <v-col
+          cols="12"
+          lg="4"
+          md="5"
+          sm="8"
+          xl="3"
+        >
+          <v-card border class="login-card pa-8 pa-md-10">
             <div class="logo-section mb-8 text-center">
               <div class="d-flex justify-center mb-4">
-                <v-avatar color="primary" size="80" class="elevation-4">
+                <v-avatar class="elevation-4" color="primary" size="80">
                   <v-icon
+                    color="white"
                     icon="mdi-account-heart"
                     size="48"
-                    color="white"
-                  ></v-icon>
+                  />
                 </v-avatar>
               </div>
               <h1 class="text-h4 font-weight-black text-primary mb-1">e-PET</h1>
@@ -26,19 +32,19 @@
               </h1>
             </div>
 
-            <v-form @submit.prevent="handleLogin" class="login-form">
+            <v-form class="login-form" @submit.prevent="handleLogin">
               <div class="input-group mb-4">
                 <label class="custom-label">Usuário</label>
                 <v-text-field
                   v-model="cpf"
-                  variant="outlined"
-                  bg-color="white"
-                  placeholder="000.000.000-00"
                   v-maska="'###.###.###-##'"
-                  prepend-inner-icon="mdi-account-outline"
+                  bg-color="white"
                   :error-messages="error"
                   hide-details="auto"
-                ></v-text-field>
+                  placeholder="000.000.000-00"
+                  prepend-inner-icon="mdi-account-outline"
+                  variant="outlined"
+                />
               </div>
 
               <div class="input-group mb-6">
@@ -47,33 +53,33 @@
                 </div>
                 <v-text-field
                   v-model="password"
-                  :type="showPassword ? 'text' : 'password'"
-                  variant="outlined"
-                  bg-color="white"
-                  placeholder="••••••••"
-                  prepend-inner-icon="mdi-lock-outline"
                   :append-inner-icon="
                     showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'
                   "
-                  @click:append-inner="showPassword = !showPassword"
+                  bg-color="white"
                   hide-details
-                ></v-text-field>
+                  placeholder="••••••••"
+                  prepend-inner-icon="mdi-lock-outline"
+                  :type="showPassword ? 'text' : 'password'"
+                  variant="outlined"
+                  @click:append-inner="showPassword = !showPassword"
+                />
               </div>
 
               <v-btn
-                type="submit"
-                color="primary"
                 block
-                size="x-large"
+                class="access-btn"
+                color="primary"
                 elevation="4"
                 :loading="loading"
-                class="access-btn"
+                size="x-large"
+                type="submit"
               >
                 Entrar no Sistema
               </v-btn>
 
               <div class="mt-8 text-center text-caption text-grey">
-                &copy; 2026 e-PET - Gestão de Saúde Pública. <br />
+                &copy; 2026 e-PET - Gestão de Saúde Pública. <br>
                 Versão 1.0.0
               </div>
             </v-form>
@@ -85,26 +91,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/authStore";
-import { storeToRefs } from "pinia";
+  import { storeToRefs } from 'pinia'
+  import { ref } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { useAuthStore } from '@/stores/authStore'
 
-const router = useRouter();
-const authStore = useAuthStore();
-const { loading, error } = storeToRefs(authStore);
+  const router = useRouter()
+  const authStore = useAuthStore()
+  const { loading, error } = storeToRefs(authStore)
 
-const cpf = ref("");
-const password = ref("");
-const showPassword = ref(false);
+  const cpf = ref('')
+  const password = ref('')
+  const showPassword = ref(false)
 
-const handleLogin = async () => {
-  const cleanCpf = cpf.value.replace(/\D/g, "");
-  const success = await authStore.login(cleanCpf, password.value);
-  if (success) {
-    router.push("/");
+  async function handleLogin () {
+    const cleanCpf = cpf.value.replace(/\D/g, '')
+    const success = await authStore.login(cleanCpf, password.value)
+    if (success) {
+      router.push('/')
+    }
   }
-};
 </script>
 
 <style scoped>

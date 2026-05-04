@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { setActivePinia, createPinia } from 'pinia'
-import { useAuthStore } from '../authStore'
+import { createPinia, setActivePinia } from 'pinia'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import api from '@/services/api'
+import { useAuthStore } from '../authStore'
 
 vi.mock('@/services/api')
 const mockedApi = api as vi.Mocked<typeof api>
@@ -18,8 +18,8 @@ describe('authStore', () => {
     const mockResponse = {
       data: {
         access_token: 'valid-token',
-        user: { id: '1', name: 'Test User', email: 'test@test.com', role: 'ACS' }
-      }
+        user: { id: '1', name: 'Test User', email: 'test@test.com', role: 'ACS' },
+      },
     }
 
     mockedApi.post.mockResolvedValueOnce(mockResponse)
@@ -36,7 +36,7 @@ describe('authStore', () => {
   it('should fail login with wrong credentials', async () => {
     const authStore = useAuthStore()
     mockedApi.post.mockRejectedValueOnce({
-      response: { data: { message: 'Credenciais inválidas' } }
+      response: { data: { message: 'Credenciais inválidas' } },
     })
 
     const result = await authStore.login('wrong', 'wrong')
