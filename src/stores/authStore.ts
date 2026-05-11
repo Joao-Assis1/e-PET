@@ -19,7 +19,7 @@ export const useAuthStore = defineStore('auth', {
 
     return {
       user,
-      token: null, // Token agora gerenciado via HttpOnly Cookie
+      token: localStorage.getItem('token'), // Recupera o token para uso em mobile
       isAuthenticated: !!user,
       loading: false,
       error: null,
@@ -32,13 +32,16 @@ export const useAuthStore = defineStore('auth', {
       this.error = null
       try {
         const response = await api.post<ILoginResponse>('/login', { cpf, senha })
-        // O token é recebido via cookie 'Set-Cookie', não mais no corpo (corpo contém apenas dados do usuário)
-        const user = response.data.user || (response.data as any)
+        const data = response.data as any
+        const user = data.user || data
+        const token = data.access_token
 
         this.user = user
+        this.token = token
         this.isAuthenticated = true
 
         localStorage.setItem('user', JSON.stringify(user))
+        if (token) localStorage.setItem('token', token)
 
         return true
       } catch (error: any) {
@@ -54,6 +57,7 @@ export const useAuthStore = defineStore('auth', {
       this.user = null
       this.isAuthenticated = false
       localStorage.removeItem('user')
+      localStorage.removeItem('token')
       // Nota: Para remover o cookie HttpOnly, o backend precisaria de uma rota de /logout
     },
 
